@@ -46,7 +46,7 @@ article {
  margin-top: 3rem;
 }
 
-.turns section {
+section {
  border: 1px solid lightgray;
  border-radius: 8px;
  padding: .2rem .7rem;
@@ -80,4 +80,22 @@ select {
 
 .statsList {
  font-size: .9rem;
+}
+
+@media (min-width: 720px) {
+ main {
+  max-width: 1024px;
+  display: grid;
+  grid-template-columns: 75% 25%;
+  gap: 1rem;
+  margin: 1rem;
+  align-items: start;
+ }
+}
+
+ul {
+ padding: 0 1rem;
+}
+li {
+ margin-bottom: .2rem;
 }
