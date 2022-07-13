@@ -1,0 +1,83 @@
+:root {
+ font-family: 'Inter', sans-serif;
+}
+
+body {
+ max-width: 720px;
+ margin: 0 auto;
+}
+main {
+ margin: .5rem;
+}
+
+table {
+ width: 100%;
+ margin: 1rem 0;
+}
+
+:is(input, button, select) {
+ border: 1px solid lightgray;
+ border-radius: 4px;
+ background-color: white;
+ padding: .3rem .5rem;
+ font-size: .95rem;
+ width: 100%;
+ box-sizing: border-box;
+}
+
+:is(input, button, select):focus {
+ outline: 1px solid gray;
+}
+
+button {
+ margin: .2rem 0;
+ background-color: #fbfbfb;
+}
+
+table button {
+ margin: 0;
+}
+
+.trVote td {
+ padding-top: 1rem;
+}
+
+article {
+ margin-top: 3rem;
+}
+
+.turns section {
+ border: 1px solid lightgray;
+ border-radius: 8px;
+ padding: .2rem .7rem;
+ margin-bottom: .7rem;
+}
+.turns button {
+ margin-top: 1rem;
+}
+
+h3 {
+ display: flex;
+ align-items: center;
+}
+.currentTurnSpan {
+ display: inline-block;
+ background-color: #f0f0f0;
+ font-size: .6rem;
+ font-weight: normal;
+ padding: .2rem .4rem;
+ border-radius: 4px;
+ margin-left: 1rem;
+}
+
+.noclick {
+ pointer-events: none;
+}
+
+select {
+ min-width: 5rem;
+}
+
+.statsList {
+ font-size: .9rem;
+}
