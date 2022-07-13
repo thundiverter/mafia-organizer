@@ -2,8 +2,6 @@
 <html>
  <head>
   <title>Мафия Организатор</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta charset="UTF-8">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,13 +12,14 @@
   
   <main id="app">
    
+   <div id="grid-main">
    <h2>Список игроков</h2>
    
    <table><tbody>
     <tr></tr>
     <tr v-for="(user, index) of users" id="playerRow">
      <td><span v-show="user.dead">💀</span></td>
-     <td><input :disabled="isPlaying === true" :value="user.name"></td>
+     <td><input :disabled="isPlaying === true" :value="user.name" autofocus></td>
      <td><select :disabled="isPlaying === true" :value="user.role"><option v-for="(role, index) in roles" :value="index">{{role[0]}}</option></select></td>
      <td><button v-show="isPlaying===false" @click="removePlayer(index)">🗑️</button></td>
      </tr>
@@ -64,9 +63,13 @@
      </table>
      
      <button v-show="isCurrentTurn(turnid)" @click="startNewTurn()">Сохранить и начать новый ход</button>
+     
     </section>
     
-    <section style="margin-top: 1.5rem;">
+   </article>
+   </div>
+   
+   <section v-show="isPlaying" style="margin-top: 1.5rem;">
      <h3>Статистика</h3>
      <ul class="statsList">
       <li>Всего <b>{{users.length}}</b> игроков, из них {{amountof('0')}}, {{amountof('1')}}, {{amountof('2')}} и {{amountof('3')}}.</li>
@@ -78,8 +81,6 @@
      </ul>
     </section>
     
-   </article>
-   
   </main>
   
   
