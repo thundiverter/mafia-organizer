@@ -8,86 +8,105 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
  </head>
  
  <body>
   
   <main id="app">
    
-   <div id="grid-main">
-   <h2>Список игроков</h2>
-   
-   <table><tbody>
-    <tr></tr>
-    <tr v-for="(user, index) of users" id="playerRow">
-     <td><span v-show="user.dead">💀</span></td>
-     <td><input :disabled="isPlaying === true" :value="user.name" autofocus></td>
-     <td><select :disabled="isPlaying === true" :value="user.role"><option v-for="(role, index) in roles" :value="index">{{role[0]}}</option></select></td>
-     <td><button v-show="isPlaying===false" @click="removePlayer(index)">🗑️</button></td>
-     </tr>
-   </tbody></table>
-   
-   <button @click="addPlayer()" v-show="!isPlaying">+ Новый игрок</button>
-   <button v-show="!isPlaying" @click="startGame()">Сохранить и начать игру</button>
-   
-   <article class="turns" v-show="isPlaying">
-    <h2>Ход игры</h2>
+   <!-- LIST OF PLAYERS -->
+   <article id="playersList" v-show="currentTab==0">
     
-    <section v-for="(turn, turnid) of turns">
-     {{turn.players}}
-     <h3>Ход {{turns.length - turnid}}  <span v-show="isCurrentTurn(turnid)" class="currentTurnSpan">ТЕКУЩИЙ</span></h3>
-     <table>
-      <tr v-for="role in roles.slice(1)">
-       <td>{{role[1]}}</td>
-       
-       <!-- Current turn -->
-       <td v-if="isCurrentTurn(turnid)"><select :value="turns[0][role[2]]" @change="changeTurnInfo($event, turnid, role[2])">
-        <option value="-1" hidden>Выберите игрока</option>
-        <option v-for="player of playersAlive" :value="player.index">{{player.name}}</option>
-        </select></td>
-        
-        <!-- Previous turns -->
-       <td v-if="!isCurrentTurn(turnid)"><select disabled>
-        <option>{{users[turns[turnid][role[2]]]?.name || "—"}}</option>
-        </select></td>
-        
-      </tr>
-      
-      <!-- Voting -->
-      <tr class="trVote">
-       <td>{{roles[0][1]}}</td>
-       <td v-if="isCurrentTurn(turnid)"><select :value="turns[0]['vote']" @change="changeTurnInfo($event, turnid, 'vote')">
-        <option value="-1" hidden>Выберите игрока</option>
-        <option v-for="player of playersAlive" :value="player.index">{{player.name}}</option>
-        </select></td>
-      </tr>
-      
-     </table>
-     
-     <button v-show="isCurrentTurn(turnid)" @click="startNewTurn()">Сохранить и начать новый ход</button>
-     
-    </section>
+    <table>
+     <tr v-for="(player, playerid) of players">
+      <td><span v-show="player.dead">💀</span></td>
+      <td><input :value="player.name" v-model="player.name" :disabled="currentTurn!=0"></td>
+      <td><select :disabled="currentTurn!=0">
+       <option v-for="(role, roleid) of roles" :value="roleif">{{role.name}}</option>
+      </select></td>
+      <td v-show="players.length > 1 && currentTurn==0"><button @click="removePlayer(playerid)" v-html="svg.trash" class="small"></button></td>
+     </tr>
+    </table>
+    
+    <button @click="createNewPlayer" v-show="currentTurn==0">+ Новый игрок</button>
+    
+    <!--<button>Сохранить и начать игру</button>-->
     
    </article>
-   </div>
    
-   <section v-show="isPlaying" style="margin-top: 1.5rem;">
-     <h3>Статистика</h3>
-     <ul class="statsList">
-      <li>Всего <b>{{users.length}}</b> игроков, из них {{amountof('0')}}, {{amountof('1')}}, {{amountof('2')}} и {{amountof('3')}}.</li>
-      <li><b>{{roles[1][1]}}:</b> {{stat.killed.join(', ') || "пока никто"}}.</li>
-      <li><b>{{roles[2][1]}}:</b> {{stat.healed.join(', ') || "пока никто"}}.</li>
-      <li><b>{{roles[3][1]}}:</b> {{stat.checked.join(', ') || "пока никто"}}.</li>
-      <li><b>Были спасены:</b> {{stat.killhealed.join(', ') || "пока никто"}}.</li>
-      <li><b>{{roles[0][1]}}:</b> {{stat.voteed.join(', ') || "пока никто"}}.</li>
-     </ul>
-    </section>
+   <!-- GAME -->
+   <article id="turnsList" v-show="currentTab==1">
     
+    <section v-for="(turn, turnid) of turns" :class="{mb: turn.time=='night'}">
+     
+      <h3>{{time[turn.time]}} {{getTurn(turnid, turn)}} <span class="current" v-show="turnid==0">ТЕКУЩИЙ</span> </h3>
+     
+     <!-- Night (current) -->
+    <div v-show="turn.time=='night'">
+    
+    <table>
+     <tr v-for="role of roles.slice(1)">
+      <td>{{role.desc}}</td>
+      <td v-if="turnid==0"><select @change="turns[0][role.action]=$event.target.value" :value="turns[0][role.action]">
+       <option v-if="turnid==0" value="-1" hidden>Выберите игрока</option>
+       <option v-for="player of playersAlive" :value="player.id">{{player.name}} ({{Number(player.id)+1}})</option>
+      </select></td>
+      <td v-if="turnid!=0"><select disabled>
+       <option>{{players[turns[turnid][role.action]]?.name || '—'}}</option>
+      </select></td>
+     </tr>
+    </table>
+    
+    </div>
+    
+    <!-- Day (current) -->
+    <div v-show="turn.time=='day'">
+    
+     <table>
+      <tr>
+       <td>Выбран голосованием</td>
+       <td v-if="turnid==0"><select @change="turns[0].vote=$event.target.value" :value="turns[0].vote">
+        <option v-if="turnid==0" value="-1" hidden>Выберите игрока</option>
+        <option v-for="player of playersAlive" :value="player.id">{{player.name}}</option>
+       </select></td>
+       <td v-if="turnid!=0"><select disabled>
+        <option>{{players[turns[turnid].vote]?.name || '—'}}</option>
+       </select></td>
+      </tr>
+     </table>
+     
+    </div>
+    
+    <button @click="startNewTurn" v-show="turnid==0"  :disabled="turns[0].vote==-1 && currentTurn%2==1">
+     <span v-show="currentTurn%2==0">Перейти к голосованию</span>
+     <span v-show="currentTurn%2==1">Новый ход</span>
+    </button>
+    
+   </section>
+    
+   </article>
+   
+   
+   <!-- STATISTICS -->
+   <article v-show="currentTab==2">
+    <!-- ... -->
+   </article>
+   
+   <!-- NAVIGATION -->
+   <nav>
+    <button :class="{current: currentTab==0}" @click="currentTab=0"><span v-html="svg.players"></span>Игроки</button>
+    <button :class="{current: currentTab==1}" @click="currentTab=1" :disabled="!isPlaying"><span v-if="currentTurn % 2 == 0" v-html="svg.moon"></span><span v-if="currentTurn%2==1" v-html="svg.day"></span>Игра</button>
+    <!--<button :class="{current: currentTab==2}" @click="currentTab=2" :disabled="!isPlaying"><span v-html="svg.stats"></span>Статистика</button>-->
+    <!--<button :class="{current: currentTab==3}" @click="currentTab=3" :disabled="currentTurn!=0"><span v-html="svg.custom"></span>Настройка</button>-->
+   </nav>
+   
   </main>
   
   
   <!-- Scripts -->
   <script src="https://unpkg.com/vue@3.2.37/dist/vue.global.prod.js"></script>
+  <script src="data.js"></script>
   <script src="main.js"></script>
   
  </body>
