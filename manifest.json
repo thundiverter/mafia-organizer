@@ -1,0 +1,14 @@
+{
+    "name": "Мафия Организатор",
+    "short_name": "MafiaHelp",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#f5f5f5",
+    "icons": [
+        {
+            "src": "/img/192.png",
+            "type": "image/png",
+            "sizes": "301x301"
+        }
+    ]
+}
