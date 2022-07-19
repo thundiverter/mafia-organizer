@@ -18,6 +18,10 @@
    <!-- LIST OF PLAYERS -->
    <article id="playersList" v-show="currentTab==0">
     
+    <div class="warning" v-show="!isPlaying">
+     Заполните все поля с именами
+    </div>
+    
     <table>
      <tr v-for="(player, playerid) of players">
       <td><span v-show="player.dead">💀</span></td>
