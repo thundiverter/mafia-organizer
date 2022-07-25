@@ -45,6 +45,10 @@
     <section v-for="(turn, turnid) of turns" :class="{mb: turn.time=='night'}">
      
       <h3>{{time[turn.time]}} {{getTurn(turnid, turn)}} <span class="current" v-show="turnid==0">ТЕКУЩИЙ</span> </h3>
+      
+    <div class="warning" v-show="turnid==0 && turn.time=='day' && turn.vote==-1">
+     Укажите игрока, который был выбран на голосовании
+    </div>
      
      <!-- Night (current) -->
     <div v-show="turn.time=='night'">
@@ -94,7 +98,11 @@
    
    <!-- STATISTICS -->
    <article v-show="currentTab==2">
-    <!-- ... -->
+    
+    <section>
+     <h3>Day 1</h3>
+    </section>
+    
    </article>
    
    <!-- NAVIGATION -->
